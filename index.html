@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+    <title>The Mouse King</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+        #form {
+            width: 200px;
+            height: 200px;
+            background-color: red;
+            display: none;
+            border-radius: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Klicke auf die Formen um zu spielen..</h1>
+    <h2>Best of 10 - also beeil dich</h2>
+    <p>Deine Zeit: <span id="zeit"></span></p>
+    <p>Deine Bestzeit: <span id="bestzeit"></span></p>
+    <p>Deine Durchschnittszeit: <span id="durchschnittszeit"></span></p>
+    <p>Versuch Nr: <span id="versuch"></span></p>
+
+    <button id="bereit">Bist du Bereit - Hier klicken</button>
+
+    <div id="form"></div>
+
+
+    <script type="text/javascript">
+        var start = new Date().getTime();
+        var i = 0;
+        var durchschnitt = 0;
+        var durchschnittszeit = 0;
+        var bestzeit = 0;
+
+        // runden
+        function roundTo(value, places) {
+            var power = Math.pow(10, places);
+            return Math.round(value * power) / power;
+        }
+
+        // function from stack overflow
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // nachkommastellen runden
+        function round(wert, dez) {
+            wert = parseFloat(wert);
+            if (!wert) return 0;
+
+            dez = parseInt(dez);
+            if (!dez) dez = 0;
+
+            var umrechnungsfaktor = Math.pow(10, dez);
+
+            return Math.round(wert * umrechnungsfaktor) / umrechnungsfaktor;
+        }
+
+
+        // Form wieder sichtbar, timer neustart
+        function makeAppearAgain() {
+            var width = (Math.random() * 200) + 100;
+            var left = (Math.random() * 200) + 100;
+            var top = (Math.random() * 200) + 100;
+
+            document.getElementById("form").style.display = "block";
+            document.getElementById("form").style.width = width + "px";
+            document.getElementById("form").style.height = width + "px";
+            document.getElementById("form").style.marginTop = top + "px";
+            document.getElementById("form").style.marginLeft = left + "px";
+            document.getElementById("form").style.backgroundColor = getRandomColor();
+
+            if (Math.random() > 0.5) {
+                document.getElementById("form").style.borderRadius = "50%";
+            } else {
+                document.getElementById("form").style.borderRadius = "0";
+            }
+            start = new Date().getTime();
+        }
+
+        // Random Timer um makeAppearAgain aufzurufen
+        function appearAfterDelay() {
+            setTimeout(makeAppearAgain, Math.random() * 2000);
+        }
+        document.getElementById("bereit").onclick = function() {
+            // funktionsaufruf zum ersten start der form
+            appearAfterDelay();
+        }
+
+
+        // Bei klick auf die Form wird diese verschwinden
+        document.getElementById("form").onclick = function() {
+            document.getElementById("form").style.display = "none";
+            // dabei wird die zeit genommen und ausgegeben. 
+
+            var end = new Date().getTime();
+            var dauerAktuell = (end - start) / 1000;
+            document.getElementById("zeit").innerHTML = round(dauerAktuell, 2) + "sec";
+            //startet neu - delay danach form
+
+
+            if (i == 0) {
+                bestzeit = dauerAktuell;
+                document.getElementById("bestzeit").innerHTML = round(bestzeit, 2) + "sec";
+            } else if (bestzeit < dauerAktuell) {
+                document.getElementById("bestzeit").innerHTML = round(bestzeit, 2) + "sec";
+            } else {
+                bestzeit = dauerAktuell;
+                document.getElementById("bestzeit").innerHTML = round(bestzeit, 2) + "sec";
+            }
+            i++;
+            durchschnittszeit += dauerAktuell;
+            durchschnitt = durchschnittszeit / i;
+            //roundTo(durchschnitt, 2);
+
+            document.getElementById("durchschnittszeit").innerHTML = round(durchschnitt, 2) + "sec";
+            if (i < 10) {
+                appearAfterDelay();
+                document.getElementById("versuch").innerHTML = i;
+            } else {
+                document.getElementById("versuch").innerHTML = i + " - Das Spiel wurde beendet";
+            }
+
+        }
+    </script>
+</body>
+
+</html>
